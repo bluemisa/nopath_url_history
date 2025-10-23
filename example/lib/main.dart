@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:nopath_url_history/nopath_url_history.dart';
-import 'app_pages.dart';
 import 'screens/a_page.dart';
 import 'screens/b_page.dart';
 import 'screens/c_page.dart';
+
+// 1️⃣ Define your pages as an enum (right in main.dart!)
+enum AppPage { a, b, c }
 
 void main() {
   // ⭐ REQUIRED: Initialize JsonNavigator BEFORE runApp()
