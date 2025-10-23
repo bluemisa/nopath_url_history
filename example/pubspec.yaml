@@ -1,0 +1,25 @@
+name: json_nav_example
+description: Example demonstrating JSON-based history navigation
+publish_to: 'none'
+version: 1.0.0
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
+  nopath_url_history:
+    path: ../
+
+  # Optional; keep example lightweight (no external deps)
+  # get: ^4.6.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

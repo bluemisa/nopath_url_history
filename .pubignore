@@ -1,0 +1,8 @@
+# Exclude GitHub Pages deployment
+docs/
+
+# Exclude IDE settings
+.grok/
+
+# Exclude example build artifacts
+example/build/
