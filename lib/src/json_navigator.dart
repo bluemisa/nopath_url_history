@@ -1,4 +1,5 @@
-import 'dart:html' as html;
+import 'package:web/web.dart' as web;
+import 'dart:js_interop';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'dart:convert';
@@ -25,7 +26,8 @@ class JsonNavigator<T extends Enum> {
     required T initialPage,
   }) {
     if (_isInitialized) {
-      throw StateError('JsonNavigator is already initialized. Call initialize() only once.');
+      throw StateError(
+          'JsonNavigator is already initialized. Call initialize() only once.');
     }
 
     if (!kIsWeb) {
@@ -83,7 +85,7 @@ class JsonNavigator<T extends Enum> {
         'page': pageName,
       };
       debugPrint('[JsonNavigator] Pushing state: $stateData');
-      html.window.history.pushState(stateData, '', '/');
+      web.window.history.pushState(stateData.jsify(), '', '/');
       _saveLastPage(pageName, {});
 
       debugPrint('[JsonNavigator] SUCCESS - page: $pageName');
@@ -95,7 +97,8 @@ class JsonNavigator<T extends Enum> {
   }
 
   /// Navigate to a page (with JSON parameters)
-  static void navigateToWithParams(String pageName, Map<String, dynamic> params) {
+  static void navigateToWithParams(
+      String pageName, Map<String, dynamic> params) {
     _ensureInitialized();
 
     final page = _nameToPage[pageName];
@@ -123,7 +126,7 @@ class JsonNavigator<T extends Enum> {
         'params': paramsJson,
       };
       debugPrint('[JsonNavigator] Pushing state: $stateData');
-      html.window.history.pushState(stateData, '', '/');
+      web.window.history.pushState(stateData.jsify(), '', '/');
       _saveLastPage(pageName, params);
 
       debugPrint('[JsonNavigator] SUCCESS - page: $pageName, params: $params');
@@ -140,7 +143,7 @@ class JsonNavigator<T extends Enum> {
     if (_isNavigating) return;
 
     try {
-      html.window.history.back();
+      web.window.history.back();
     } catch (e) {
       debugPrint('[JsonNavigator] Go back error: $e');
     }
@@ -152,7 +155,7 @@ class JsonNavigator<T extends Enum> {
     if (_isNavigating) return;
 
     try {
-      html.window.history.forward();
+      web.window.history.forward();
     } catch (e) {
       debugPrint('[JsonNavigator] Go forward error: $e');
     }
@@ -160,7 +163,7 @@ class JsonNavigator<T extends Enum> {
 
   /// Get parameters of current page
   static Map<String, dynamic> getParams() {
-    final data = html.window.sessionStorage['currentParams'];
+    final data = web.window.sessionStorage.getItem('currentParams');
     if (data == null || data.isEmpty) return {};
 
     try {
@@ -186,22 +189,24 @@ class JsonNavigator<T extends Enum> {
   // Private methods
   static void _ensureInitialized() {
     if (!_isInitialized) {
-      throw StateError('JsonNavigator is not initialized. Call initialize() first.');
+      throw StateError(
+          'JsonNavigator is not initialized. Call initialize() first.');
     }
   }
 
   static void _clearParams() {
-    html.window.sessionStorage.remove('currentParams');
+    web.window.sessionStorage.removeItem('currentParams');
   }
 
   static void _setParams(Map<String, dynamic> params) {
-    html.window.sessionStorage['currentParams'] = jsonEncode(params);
+    web.window.sessionStorage.setItem('currentParams', jsonEncode(params));
   }
 
   static void _setupBrowserListener() {
-    html.window.onPopState.listen((event) {
+    web.window.addEventListener('popstate', ((web.Event event) {
       try {
-        final state = event.state;
+        final popStateEvent = event as web.PopStateEvent;
+        final state = popStateEvent.state?.dartify();
         debugPrint('[JsonNavigator] PopState event: $state');
 
         if (state != null && state is Map && state['flutter'] == true) {
@@ -223,7 +228,7 @@ class JsonNavigator<T extends Enum> {
         debugPrint('[JsonNavigator] PopState error: $e');
         _handleInvalidState();
       }
-    });
+    }.toJS));
   }
 
   static void _restoreAppStateSync(String pageName, String? paramsJson) {
@@ -246,7 +251,8 @@ class JsonNavigator<T extends Enum> {
         _currentPageNotifier.value = page;
         _lastRestoredPage = page;
 
-        debugPrint('[JsonNavigator] Restored to: $pageName${paramsJson != null ? ' with params' : ''}');
+        debugPrint(
+            '[JsonNavigator] Restored to: $pageName${paramsJson != null ? ' with params' : ''}');
       }
     } catch (e) {
       debugPrint('[JsonNavigator] RestoreAppStateSync error: $e');
@@ -268,13 +274,13 @@ class JsonNavigator<T extends Enum> {
       if (params.isNotEmpty) 'params': jsonEncode(params),
     };
     debugPrint('[JsonNavigator] ReplaceState with: $stateData');
-    html.window.history.replaceState(stateData, '', '/');
+    web.window.history.replaceState(stateData.jsify(), '', '/');
     _saveLastPage(targetPage.name, params);
   }
 
   static void _setInitialBrowserState() {
     try {
-      final lastPageData = html.window.sessionStorage['lastPage'];
+      final lastPageData = web.window.sessionStorage.getItem('lastPage');
       if (lastPageData != null && lastPageData.isNotEmpty) {
         debugPrint('[JsonNavigator] sessionStorage already has data, skipping');
         return;
@@ -289,7 +295,7 @@ class JsonNavigator<T extends Enum> {
         if (params.isNotEmpty) 'params': jsonEncode(params),
       };
       debugPrint('[JsonNavigator] Setting initial state: $stateData');
-      html.window.history.replaceState(stateData, '', '/');
+      web.window.history.replaceState(stateData.jsify(), '', '/');
       _saveLastPage(_currentPage!.name, params);
     } catch (e) {
       debugPrint('[JsonNavigator] SetInitialBrowserState error: $e');
@@ -302,7 +308,7 @@ class JsonNavigator<T extends Enum> {
         'page': pageName,
         'params': params,
       };
-      html.window.sessionStorage['lastPage'] = jsonEncode(data);
+      web.window.sessionStorage.setItem('lastPage', jsonEncode(data));
       debugPrint('[JsonNavigator] Saved to sessionStorage: $data');
     } catch (e) {
       debugPrint('[JsonNavigator] Save last page error: $e');
@@ -312,8 +318,10 @@ class JsonNavigator<T extends Enum> {
   static void _restoreLastPage() {
     try {
       // 브라우저 history state를 먼저 확인
-      final currentState = html.window.history.state;
-      if (currentState != null && currentState is Map && currentState['flutter'] == true) {
+      final currentState = web.window.history.state?.dartify();
+      if (currentState != null &&
+          currentState is Map &&
+          currentState['flutter'] == true) {
         final pageName = currentState['page']?.toString();
         final paramsJson = currentState['params']?.toString();
 
@@ -324,9 +332,11 @@ class JsonNavigator<T extends Enum> {
               try {
                 final params = jsonDecode(paramsJson) as Map<String, dynamic>;
                 _setParams(params);
-                debugPrint('[JsonNavigator] Restored params from history.state: $params');
+                debugPrint(
+                    '[JsonNavigator] Restored params from history.state: $params');
               } catch (e) {
-                debugPrint('[JsonNavigator] Failed to parse params from history.state: $e');
+                debugPrint(
+                    '[JsonNavigator] Failed to parse params from history.state: $e');
               }
             }
             _currentPage = page;
@@ -336,14 +346,15 @@ class JsonNavigator<T extends Enum> {
             // sessionStorage도 업데이트
             _saveLastPage(pageName, getParams());
 
-            debugPrint('[JsonNavigator] Restored from history.state: $pageName');
+            debugPrint(
+                '[JsonNavigator] Restored from history.state: $pageName');
             return;
           }
         }
       }
 
       // Fallback: sessionStorage에서 복원
-      final lastPageData = html.window.sessionStorage['lastPage'];
+      final lastPageData = web.window.sessionStorage.getItem('lastPage');
       if (lastPageData != null && lastPageData.isNotEmpty) {
         try {
           final data = jsonDecode(lastPageData) as Map<String, dynamic>;
@@ -355,13 +366,15 @@ class JsonNavigator<T extends Enum> {
             if (page != null) {
               if (params != null && params.isNotEmpty) {
                 _setParams(params);
-                debugPrint('[JsonNavigator] Restored params from sessionStorage: $params');
+                debugPrint(
+                    '[JsonNavigator] Restored params from sessionStorage: $params');
               }
               _currentPage = page;
               _currentPageNotifier.value = page;
               _lastRestoredPage = page;
 
-              debugPrint('[JsonNavigator] Restored from sessionStorage: $pageName');
+              debugPrint(
+                  '[JsonNavigator] Restored from sessionStorage: $pageName');
               return;
             }
           }
