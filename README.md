@@ -7,6 +7,50 @@ A Flutter Web navigation library that uses browser history API without changing 
 
 **[🚀 Try Live Demo](https://bluemisa.github.io/nopath_url_history/)**
 
+## Quick Overview
+
+- What: Keep the browser URL fixed at `/` while still supporting back/forward and refresh with full JSON params and state restoration.
+- Perfect for: Admin dashboards, internal tools, private apps where URLs shouldn’t be exposed and deep-linking/SEO aren’t required.
+- How: Bypasses Flutter’s routing URL writes, stores navigation data in `history.state` and `sessionStorage`, and drives the UI via a simple enum-based API.
+
+30‑second setup (typed API + per‑page guard):
+
+```dart
+enum AppPage { login, home, details }
+
+// Optional per-page guard
+GuardDecision<AppPage> authGuard(Map<String, dynamic> params) =>
+  auth.isLoggedIn
+    ? const GuardDecision.allow()
+    : const GuardDecision.redirect(AppPage.login, replace: true);
+
+void main() {
+  final authed = auth.isLoggedIn; // your auth check
+  JsonNavigator.initialize<AppPage>(
+    pages: [
+      PageConfig(AppPage.login, () => const LoginPage()),
+      PageConfig(AppPage.home, () => const HomePage(), authGuard),
+      PageConfig(AppPage.details, () => const DetailsPage(), authGuard),
+    ],
+    initialPage: authed ? AppPage.home : AppPage.login, // initial page should be public
+    enableLogging: kDebugMode,
+  );
+  runApp(const MaterialApp(home: JsonNavigatorWrapper()));
+}
+
+// Navigate anywhere with typed API
+JsonNavigator.navigateToEnumWithParams(AppPage.details, {'id': 42});
+// Replace current entry (no new history entry)
+JsonNavigator.replaceToEnum(AppPage.home);
+```
+
+Key capabilities:
+- Enum-based pages and typed navigation
+- JSON parameters without URL encoding
+- Browser back/forward and refresh persistence
+- Page-level middleware (guards) for auth/permissions
+- Logging toggle (`enableLogging` / `setLoggingEnabled`)
+
 ## Features
 
 - **Fixed URL Navigation**: URL stays at `/` while navigation works perfectly
@@ -119,6 +163,8 @@ JsonNavigator.goForward();
 ```
 
 > **💡 Pro Tip**: Page names are strings (`'profile'`, `'home'`) that match your enum names. The enum is only for type-safe configuration!
+> 
+> Note: `initialPage` is required and must be one of the pages registered in the `pages` list. Otherwise, initialization throws an ArgumentError.
 
 ## Complete Example
 
@@ -241,6 +287,79 @@ class DetailsPage extends StatelessWidget {
 
 ### JsonNavigator
 
+#### Typed APIs (recommended)
+Type-safe alternatives that use your enum directly:
+
+```dart
+// Navigate using enum (no params)
+JsonNavigator.navigateToEnum(AppPage.details);
+
+// Navigate using enum (with params)
+JsonNavigator.navigateToEnumWithParams(AppPage.details, {
+  'id': 1,
+  'flags': ['a', 'b'],
+});
+
+// Replace current page using enum (no new history entry)
+JsonNavigator.replaceToEnum(AppPage.details, params: {'id': 2});
+
+// Get current page as typed enum
+final AppPage? current = JsonNavigator.currentPageAs<AppPage>();
+```
+
+> Uses the enum type provided at `initialize<T>()`. Access with a different enum type will throw a StateError.
+
+#### Logging
+Control internal logging emitted by the library.
+
+```dart
+// Enable/disable at initialization (defaults to kDebugMode)
+JsonNavigator.initialize<AppPage>(
+  pages: [
+    PageConfig(AppPage.home, () => const HomePage()),
+  ],
+  initialPage: AppPage.home,
+  enableLogging: true, // or false
+);
+
+// Toggle at runtime
+JsonNavigator.setLoggingEnabled(false);
+```
+
+#### Page Middleware (per-page guards)
+Protect pages with a simple middleware that can allow or redirect before navigation commits.
+
+```dart
+// 1) Define an enum
+enum AppPage { login, home, admin }
+
+// 2) Define a middleware (sync)
+GuardDecision<AppPage> authGuard(Map<String, dynamic> params) {
+  final authed = auth.isLoggedIn; // your app's auth state
+  return authed
+      ? const GuardDecision.allow()
+      : const GuardDecision.redirect(AppPage.login, replace: true);
+}
+
+// 3) Register pages with optional middleware (3rd positional arg)
+JsonNavigator.initialize<AppPage>(
+  pages: [
+    PageConfig(AppPage.login, () => const LoginPage()),
+    PageConfig(AppPage.home, () => const HomePage(), authGuard),
+    PageConfig(AppPage.admin, () => const AdminPage(), authGuard),
+  ],
+  initialPage: AppPage.login, // initial page should be public
+);
+
+// 4) Navigate as usual — guards run before commit
+JsonNavigator.navigateToEnum(AppPage.admin); // will redirect to login if not authed
+```
+
+Notes:
+- Guards run for navigate/push, replace, browser back/forward (popstate), and refresh restores.
+- `redirect(..., replace: true)` (default) rewrites history to avoid leaving blocked pages on the stack.
+- Avoid redirect loops (e.g., make login page public or conditionally allow after login).
+
 #### `initialize<T extends Enum>`
 Initialize the navigator with page configurations.
 
@@ -297,6 +416,13 @@ Get the current page name.
 
 ```dart
 final pageName = JsonNavigator.currentPageName;
+```
+
+#### `currentPageAs<T extends Enum>()`
+Get the current page as typed enum. Throws if accessed with a different enum type than was used at `initialize<T>()`.
+
+```dart
+final AppPage? page = JsonNavigator.currentPageAs<AppPage>();
 ```
 
 ### PageConfig

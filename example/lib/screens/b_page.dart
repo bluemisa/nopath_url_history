@@ -109,18 +109,24 @@ class _BPageState extends State<BPage> {
                       children: [
                         const Text(
                           'Test Steps:',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
                         const Text('1. A → B: Check params below'),
-                        const Text('2. Click Refresh (top) - params should persist'),
-                        const Text('3. Browser refresh (F5) - params should persist'),
+                        const Text(
+                            '2. Click Refresh (top) - params should persist'),
+                        const Text(
+                            '3. Browser refresh (F5) - params should persist'),
                         const Text('4. Click Back - go to A'),
-                        const Text('5. Click Forward - return to B with params'),
+                        const Text(
+                            '5. Click Forward - return to B with params'),
                         const SizedBox(height: 8),
                         Text(
                           'Refresh Count: $refreshCount',
-                          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange),
                         ),
                       ],
                     ),
@@ -135,7 +141,8 @@ class _BPageState extends State<BPage> {
                       children: [
                         const Text(
                           'Params from A:',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
                         Container(
@@ -148,7 +155,8 @@ class _BPageState extends State<BPage> {
                           ),
                           child: Text(
                             jsonEncode(params),
-                            style: const TextStyle(fontSize: 14, fontFamily: 'monospace'),
+                            style: const TextStyle(
+                                fontSize: 14, fontFamily: 'monospace'),
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -156,11 +164,14 @@ class _BPageState extends State<BPage> {
                           spacing: 8,
                           children: [
                             ElevatedButton(
-                              onPressed: () => JsonNavigator.navigateToWithParams('c', params), // ⭐ With params
+                              onPressed: () =>
+                                  JsonNavigator.navigateToWithParams(
+                                      'c', params), // ⭐ With params
                               child: const Text('Go to C (same params)'),
                             ),
                             ElevatedButton(
-                              onPressed: () => JsonNavigator.navigateTo('c'), // ⭐ Without params
+                              onPressed: () => JsonNavigator.navigateTo(
+                                  'c'), // ⭐ Without params
                               child: const Text('Go to C (empty)'),
                             ),
                           ],
@@ -180,7 +191,8 @@ class _BPageState extends State<BPage> {
                           children: [
                             const Text(
                               'Custom Params for C:',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                             const Spacer(),
                             IconButton(
@@ -233,7 +245,8 @@ class _BPageState extends State<BPage> {
                         ElevatedButton.icon(
                           onPressed: () {
                             final customParams = _buildCustomParams();
-                            JsonNavigator.navigateToWithParams('c', customParams);
+                            JsonNavigator.navigateToWithParams(
+                                'c', customParams);
                           },
                           icon: const Icon(Icons.arrow_forward),
                           label: const Text('Go to C with custom params'),

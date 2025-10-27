@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:nopath_url_history/nopath_url_history.dart';
+import '../main.dart'; // Import for AppPage enum
 
 class CPage extends StatelessWidget {
   const CPage({super.key});
@@ -9,6 +10,9 @@ class CPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // ⭐ Get parameters from previous page
     final params = JsonNavigator.getParams();
+
+    // ⭐ Get current page as typed enum
+    final currentPage = JsonNavigator.currentPageAs<AppPage>();
 
     return Scaffold(
       appBar: AppBar(
@@ -29,6 +33,25 @@ class CPage extends StatelessWidget {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
+                Card(
+                  color: Colors.green.shade50,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Current Page Info (Typed API):',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        Text('currentPageAs<AppPage>() = ${currentPage?.name}'),
+                        Text('Type: ${currentPage.runtimeType}'),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -52,12 +75,52 @@ class CPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
+                const Text(
+                  'Test replaceTo() - replaces history without adding new entry:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Card(
+                  color: Colors.orange.shade50,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Instructions:',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 12),
+                        ),
+                        const Text('1. Click "Replace to A" below',
+                            style: TextStyle(fontSize: 12)),
+                        const Text('2. Press browser Back button',
+                            style: TextStyle(fontSize: 12)),
+                        const Text(
+                            '3. You should skip C and go to B (C was replaced!)',
+                            style: TextStyle(fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
                 Wrap(
                   spacing: 8,
+                  runSpacing: 8,
                   children: [
-                    ElevatedButton(
-                      onPressed: () => JsonNavigator.navigateTo('a'), // ⭐ Navigate without params
-                      child: const Text('Go to A'),
+                    ElevatedButton.icon(
+                      onPressed: () => JsonNavigator.navigateToEnum(
+                          AppPage.a), // ⭐ Navigate (adds to history)
+                      icon: const Icon(Icons.arrow_forward),
+                      label: const Text('Navigate to A (adds to history)'),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () => JsonNavigator.replaceToEnum(
+                          AppPage.a), // ⭐ Replace with enum
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange),
+                      icon: const Icon(Icons.swap_horiz),
+                      label: const Text('Replace to A (no history)'),
                     ),
                     ElevatedButton(
                       onPressed: JsonNavigator.goBack, // ⭐ Browser back
@@ -73,4 +136,3 @@ class CPage extends StatelessWidget {
     );
   }
 }
-

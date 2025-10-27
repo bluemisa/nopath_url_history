@@ -1,8 +1,10 @@
 name: nopath_url_history
 description: A Flutter Web navigation library that uses browser history API without changing URLs. Supports complex JSON parameters and browser back/forward navigation.
-version: 0.1.1
+version: 0.1.2
 homepage: https://github.com/bluemisa/nopath_url_history
 repository: https://github.com/bluemisa/nopath_url_history
+platforms:
+  web: null
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

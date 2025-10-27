@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:nopath_url_history/nopath_url_history.dart';
+import '../main.dart'; // Import for AppPage enum
 
 class APage extends StatefulWidget {
   const APage({super.key});
@@ -91,12 +92,16 @@ class _APageState extends State<APage> {
                               child: const Text('Reset'),
                             ),
                             const Spacer(),
-                            ElevatedButton(
+                            ElevatedButton.icon(
                               onPressed: () {
-                                // ⭐ Navigate with JSON parameters
-                                JsonNavigator.navigateToWithParams('b', params);
+                                // ⭐ Navigate with enum and params (Typed API)
+                                JsonNavigator.navigateToEnumWithParams(
+                                    AppPage.b, params);
                               },
-                              child: const Text('Go to B with JSON'),
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green),
+                              icon: const Icon(Icons.arrow_forward),
+                              label: const Text('Go to B with JSON'),
                             ),
                           ],
                         ),
@@ -111,7 +116,8 @@ class _APageState extends State<APage> {
                                   width: 240,
                                   child: TextField(
                                     controller: item.keyController,
-                                    decoration: const InputDecoration(labelText: 'key'),
+                                    decoration:
+                                        const InputDecoration(labelText: 'key'),
                                     onChanged: (_) => setState(() {}),
                                   ),
                                 ),
@@ -119,7 +125,8 @@ class _APageState extends State<APage> {
                                 Expanded(
                                   child: TextField(
                                     controller: item.valueController,
-                                    decoration: const InputDecoration(labelText: 'value'),
+                                    decoration: const InputDecoration(
+                                        labelText: 'value'),
                                     onChanged: (_) => setState(() {}),
                                   ),
                                 ),

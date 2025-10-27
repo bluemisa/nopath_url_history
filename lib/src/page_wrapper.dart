@@ -40,10 +40,12 @@ class JsonNavigatorWrapper extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 'Page "${page.name}" is not registered',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              const Text('Please register this page using JsonNavigator.initialize()'),
+              const Text(
+                  'Please register this page using JsonNavigator.initialize()'),
             ],
           ),
         ),

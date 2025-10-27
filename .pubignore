@@ -6,3 +6,6 @@ docs/
 
 # Exclude example build artifacts
 example/build/
+
+# Exclude root lockfile for library packages
+pubspec.lock
