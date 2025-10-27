@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:nopath_url_history/nopath_url_history.dart';
 import '../main.dart'; // Import for AppPage enum
+import '../widgets/demo_top_actions.dart';
 
 class CPage extends StatelessWidget {
   const CPage({super.key});
@@ -18,6 +19,7 @@ class CPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('C Page'),
         backgroundColor: Colors.orange,
+        actions: const [DemoTopActions()],
       ),
       body: Center(
         child: Padding(
@@ -51,6 +53,8 @@ class CPage extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(height: 12),
+                // Removed String API display; using typed API exclusively in example
                 const SizedBox(height: 12),
                 Card(
                   child: Padding(

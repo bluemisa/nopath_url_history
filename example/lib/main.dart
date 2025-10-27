@@ -3,19 +3,44 @@ import 'package:nopath_url_history/nopath_url_history.dart';
 import 'screens/a_page.dart';
 import 'screens/b_page.dart';
 import 'screens/c_page.dart';
+import 'screens/login_page.dart';
+import 'demo_globals.dart';
 
 // 1️⃣ Define your pages as an enum (right in main.dart!)
-enum AppPage { a, b, c }
+enum AppPage { login, a, b, c }
 
 void main() {
+  // Restore persisted demo state (e.g., login cookie) before init
+  DemoGlobals.init();
   // ⭐ REQUIRED: Initialize JsonNavigator BEFORE runApp()
   JsonNavigator.initialize<AppPage>(
     pages: [
+      PageConfig(AppPage.login, () => const LoginPage()),
       PageConfig(AppPage.a, () => const APage()),
-      PageConfig(AppPage.b, () => const BPage()),
-      PageConfig(AppPage.c, () => const CPage()),
+      // Protect B and C with a simple auth guard
+      PageConfig(
+        AppPage.b,
+        () => const BPage(),
+        (params) => DemoGlobals.isLoggedIn.value
+            ? const GuardDecision.allow()
+            : GuardDecision.redirect(
+                AppPage.login,
+                replace: true,
+              ),
+      ),
+      PageConfig(
+        AppPage.c,
+        () => const CPage(),
+        (params) => DemoGlobals.isLoggedIn.value
+            ? const GuardDecision.allow()
+            : GuardDecision.redirect(
+                AppPage.login,
+                replace: true,
+              ),
+      ),
     ],
-    initialPage: AppPage.a,
+    // Start on Login page regardless of auth state
+    initialPage: AppPage.login,
   );
 
   runApp(const MyApp());

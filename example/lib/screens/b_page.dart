@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:nopath_url_history/nopath_url_history.dart';
+import '../main.dart'; // Import for AppPage enum
+import '../widgets/demo_top_actions.dart';
 
 class BPage extends StatefulWidget {
   const BPage({super.key});
@@ -69,22 +71,8 @@ class _BPageState extends State<BPage> {
       appBar: AppBar(
         title: const Text('B Page'),
         backgroundColor: Colors.green,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: JsonNavigator.goBack, // ⭐ Browser back
-            tooltip: 'Back',
-          ),
-          IconButton(
-            icon: const Icon(Icons.arrow_forward),
-            onPressed: JsonNavigator.goForward, // ⭐ Browser forward
-            tooltip: 'Forward',
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _refresh,
-            tooltip: 'Refresh',
-          ),
+        actions: const [
+          DemoTopActions(),
         ],
       ),
       body: SingleChildScrollView(
@@ -95,6 +83,27 @@ class _BPageState extends State<BPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      onPressed: JsonNavigator.goBack, // ⭐ Browser back
+                      tooltip: 'Back',
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.arrow_forward),
+                      onPressed: JsonNavigator.goForward, // ⭐ Browser forward
+                      tooltip: 'Forward',
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.refresh),
+                      onPressed: _refresh,
+                      tooltip: 'Refresh',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
                 const Text(
                   'B Page: Test Navigation',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -165,13 +174,13 @@ class _BPageState extends State<BPage> {
                           children: [
                             ElevatedButton(
                               onPressed: () =>
-                                  JsonNavigator.navigateToWithParams(
-                                      'c', params), // ⭐ With params
+                                  JsonNavigator.navigateToEnumWithParams(
+                                      AppPage.c, params), // ⭐ With params (typed)
                               child: const Text('Go to C (same params)'),
                             ),
                             ElevatedButton(
-                              onPressed: () => JsonNavigator.navigateTo(
-                                  'c'), // ⭐ Without params
+                              onPressed: () => JsonNavigator.navigateToEnum(
+                                  AppPage.c), // ⭐ Without params (typed)
                               child: const Text('Go to C (empty)'),
                             ),
                           ],
@@ -245,8 +254,8 @@ class _BPageState extends State<BPage> {
                         ElevatedButton.icon(
                           onPressed: () {
                             final customParams = _buildCustomParams();
-                            JsonNavigator.navigateToWithParams(
-                                'c', customParams);
+                            JsonNavigator.navigateToEnumWithParams(
+                                AppPage.c, customParams);
                           },
                           icon: const Icon(Icons.arrow_forward),
                           label: const Text('Go to C with custom params'),

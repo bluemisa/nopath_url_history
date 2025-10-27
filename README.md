@@ -7,6 +7,25 @@ A Flutter Web navigation library that uses browser history API without changing 
 
 **[🚀 Try Live Demo](https://bluemisa.github.io/nopath_url_history/)**
 
+## Live Demo Guide
+
+Use the Live Demo to quickly verify every feature without reading code.
+
+- Top-right toggles: switch Login and Logging on/off any time.
+- A Page: build JSON and navigate to B via string or typed API.
+- B Page: inspect received params, try Back/Forward/Refresh, and go to C.
+- C Page: test replace vs push, and view current page via typed and string APIs.
+- Login Page: appears when guards redirect; toggle Login and continue to target.
+
+Walk‑through:
+- Toggle Logging to see internal logs in the console.
+- On A, add key/values and click “Go to B” (string or typed API).
+- On B, click the top buttons: Back, Forward, Refresh (and press F5). Params persist.
+- On B, “Go to C (same params)” and “Go to C (empty)” to compare behaviors.
+- On C, click “Replace to A” then use Back; notice C is skipped (no history entry).
+- Turn Login OFF, then try going to B/C: you’ll be redirected to Login.
+- On Login, toggle Login ON and click “Continue to …” to return; original params forward.
+
 ## Quick Overview
 
 - What: Keep the browser URL fixed at `/` while still supporting back/forward and refresh with full JSON params and state restoration.

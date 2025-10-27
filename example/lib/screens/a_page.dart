@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:nopath_url_history/nopath_url_history.dart';
 import '../main.dart'; // Import for AppPage enum
+import '../widgets/demo_top_actions.dart';
 
 class APage extends StatefulWidget {
   const APage({super.key});
@@ -63,6 +64,7 @@ class _APageState extends State<APage> {
       appBar: AppBar(
         title: const Text('A Page'),
         backgroundColor: Colors.blue,
+        actions: const [DemoTopActions()],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -73,6 +75,8 @@ class _APageState extends State<APage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text('A Page: Build JSON and navigate to B'),
+                const SizedBox(height: 12),
+                const _InstructionsCard(),
                 const SizedBox(height: 12),
                 Card(
                   child: Padding(
@@ -183,5 +187,33 @@ class _KVItem {
   void dispose() {
     keyController.dispose();
     valueController.dispose();
+  }
+}
+
+class _InstructionsCard extends StatelessWidget {
+  const _InstructionsCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: Colors.blue.shade50,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Text(
+              'Demo Guide:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text('1) Use the top-right toggles: Logging, Login'),
+            Text('2) Add key/values below to build JSON'),
+            Text('3) "Go to B with JSON" to pass data'),
+            Text('4) If Login is OFF, navigating to B/C redirects to Login'),
+          ],
+        ),
+      ),
+    );
   }
 }
